@@ -57,7 +57,8 @@ primary key(atm_card_number));
 create table credit_card (
 account_number int NOT NULL check (account_number >= 11111111),
 card_limit bigint not null check (card_limit > 0 and card_limit <= 50000000),
-type color not null ,
+-- remember it is not type (need to do)
+color varchar not null ,
 expiry_date date not null,
 credit_card_issue_date date not null,
 card_id int not null
