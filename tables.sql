@@ -66,3 +66,23 @@ card_id int not null
 foreign key (account_number) references Account(account_number) on update cascade on
 delete cascade,
 primary key (card_id));
+
+create table fixed_deposit (
+    open_date date NOT NULL,
+    fd_id int NOT NULL,
+    account_number int NOT NULL,
+    interest float not null check (interest > 0),
+    duration int not null,
+    primary key (fd_id),
+    foreign key (account_number) references Account(account_number)
+);
+
+create table locker (
+locker_id int NOT NULL,
+fd_id int,
+issue_date date,
+availability int NOT NULL,
+size int NOT NULL,
+foreign key (fd_id) references fixed_deposit(fd_id) on update cascade on
+delete cascade,
+primary key (locker_id));
