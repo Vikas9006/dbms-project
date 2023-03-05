@@ -4,4 +4,14 @@ CREATE VIEW detail AS (select credit_card.account_number, foo.atm_card_number, c
 
 DROP VIEW detail;
 
-CREATE VIEW locker_availability AS (select size, count(locker_id) from locker group by size having availability = 1);
+CREATE VIEW locker_availability AS (select size, availability, count(locker_id) from locker group by size, availability );
+
+CREATE ROLE employee;
+CREATE ROLE customer;
+grant select, update, insert, delete on Account, locker, supports, holds, customer to employee;
+grant select on locker_availability to customer;
+CREATE ROLE emp1 LOGIN PASSWORD 'emp1';
+GRANT employee to emp1;
+CREATE ROLE cust1 LOGIN PASSWORD 'cust1';
+GRANT select on detail to cust1;
+GRANT customer to cust1;
