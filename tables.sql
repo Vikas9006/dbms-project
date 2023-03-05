@@ -105,6 +105,14 @@ CREATE TABLE branch(
     PRIMARY KEY (branch_id)
 );
 
+CREATE TABLE has(
+    branch_id int not null,
+    account_number int not null,
+    foreign key (branch_id) REFERENCES branch(branch_id),
+    foreign key (account_number) references account(account_number),
+    primary key (branch_id, account_number)
+);
+
 CREATE TABLE employee (
     employee_id serial NOT NULL,
     name varchar(15) NULL,
@@ -118,3 +126,13 @@ CREATE TABLE employee (
 
 ALTER TABLE account
 ADD branch_id int;
+
+
+create table loan (
+    loan_id int NOT NULL,
+    account_number int NOT NULL,
+    rate int check (rate > 0 and rate < 100) not null,
+    amount int NOT NULL,
+    foreign key (account_number) references account(account_number),
+    primary key (loan_id)
+);
