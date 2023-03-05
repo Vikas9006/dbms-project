@@ -50,5 +50,8 @@ SELECT b.branch_id, t.sender_id, t.receiver_id FROM branch b INNER JOIN Account 
 ON b.branch_id = a.branch_id INNER JOIN transaction t
 ON a.account_number = t.sender_id OR a.account_number = t.receiver_id;
 
--- all account numbers which do not have kyc (i.e. pan number is null)
-SELECT * FROM 
+-- number of lockers per account number
+SELECT account_number, COUNT(fd_id) AS count_lockers FROM (SELECT acc.account_number, haslocker.fd_id
+FROM (SELECT fd.account_number, l.fd_id AS fd_id FROM fixed_deposit fd INNER JOIN locker l
+ON fd.fd_id = l.fd_id) AS haslocker RIGHT OUTER JOIN account acc
+ON haslocker.account_number = acc.account_number) AS acc_fd GROUP BY account_number;
