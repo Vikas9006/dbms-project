@@ -86,3 +86,35 @@ size int NOT NULL,
 foreign key (fd_id) references fixed_deposit(fd_id) on update cascade on
 delete cascade,
 primary key (locker_id));
+
+CREATE TABLE transaction (
+    transaction_id serial NOT NULL,
+    sender_id bigint NULL,
+    receiver_id bigint NULL,
+    amount float NULL,
+    date varchar(15),
+    PRIMARY KEY (transaction_id),
+    FOREIGN KEY (sender_id) REFERENCES Account(account_number),
+    FOREIGN KEY (receiver_id) REFERENCES Account(account_number)
+);
+
+CREATE TABLE branch(
+    branch_id serial NOT NULL,
+    name varchar(15) NULL,
+    address varchar(15) NULL,
+    PRIMARY KEY (branch_id)
+);
+
+CREATE TABLE employee (
+    employee_id serial NOT NULL,
+    name varchar(15) NULL,
+    address varchar(15) NULL,
+    salary int NULL,
+    branch_id int NOT NULL,
+    dob varchar(15) NULL,
+    PRIMARY KEY (employee_id),
+    FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
+);
+
+ALTER TABLE account
+ADD branch_id int;
