@@ -75,15 +75,15 @@ FROM has natural join supports group by branch_id) as foo;
 
 -- last repayment date (if exists, otherwise return loan issue date)
 CREATE OR REPLACE FUNCTION last_repay_date(lo_id INT)
-RETURNS TEXT
+RETURNS DATE
 LANGUAGE plpgsql
 as
 $$
 DECLARE
-    last_date TEXT;
+    last_date DATE;
     cnt INT;
 BEGIN
-    SELECT * FROM loan INNER JOIN loan_repayment
+    SELECT date FROM loan INNER JOIN loan_repayment
     ON loan.loan_id = loan_repayment.loan_id AND loan.loan_id = lo_id
     ORDER BY loan_repayment.date DESC LIMIT 1 INTO last_date;
     SELECT COUNT(*) FROM loan_repayment WHERE loan_id = lo_id INTO cnt;
@@ -99,7 +99,7 @@ $$;
 CREATE OR REPLACE FUNCTION set_due_amount() RETURNS TRIGGER AS $$
     BEGIN
         UPDATE loan
-        SET NEW.due_amount = NEW.issued_amount;
+        SET due_amount = NEW.issued_amount WHERE loan_id = NEW.loan_id;
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
@@ -111,27 +111,32 @@ FOR EACH ROW EXECUTE PROCEDURE set_due_amount();
 CREATE OR REPLACE FUNCTION update_due_amount() RETURNS TRIGGER AS $$
     DECLARE
         l_id INT;
-        last_date INT;
-        curr_date INT;
-        interest INT;
+        last_date DATE;
+        curr_date DATE;
+        interest FLOAT;
         due_amnt INT;
         new_amount INT;
+        applied_interest INT;
         time INT;
     BEGIN
         -- Fetch loan id
-        SELECT loan_id FROM NEW INTO l_id;
+        SELECT loan_id FROM loan_repayment WHERE repayment_id = NEW.repayment_id INTO l_id;
         SELECT last_repay_date(l_id) INTO last_date;
-        SELECT date FROM NEW INTO curr_date;
+        SELECT date FROM loan_repayment WHERE repayment_id = NEW.repayment_id INTO curr_date;
         SELECT rate FROM loan WHERE loan_id = l_id INTO interest;
         SELECT due_amount FROM loan WHERE loan_id = l_id INTO due_amnt;
         SELECT DATE_PART('year', curr_date::date) - DATE_PART('year', last_date::date) INTO time;
-        SELECT due_amount*(1 + (interest/100))^time INTO new_amount - NEW.amount;
+        SELECT due_amnt *(1 + (interest/100))^time INTO applied_interest;
+        SELECT due_amnt + applied_interest - NEW.amount INTO new_amount;
         UPDATE loan
         SET due_amount = new_amount
         WHERE loan_id = l_id;
-        RETURN NEW;
+        RETURN NEW;       
     END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER update_due_amount AFTER INSERT ON loan_repayment
+FOR EACH ROW EXECUTE PROCEDURE update_due_amount();
 
 SELECT DATE_PART('day', '2024-03-09'::timestamp - '2021-02-07'::timestamp);
 SELECT DATE_PART('year', '2012-01-01'::date) - DATE_PART('year', '2008-10-02'::date);

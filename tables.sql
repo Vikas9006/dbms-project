@@ -131,10 +131,10 @@ ADD branch_id int;
 create table loan (
     loan_id int NOT NULL,
     account_number int NOT NULL,
-    rate int check (rate > 0 and rate < 100) not null,
+    rate FLOAT check (rate >= 0 and rate <= 100) not null,
     issued_amount int NOT NULL,
     due_amount INT NULL,
-    issue_date TEXT NOT NULL,
+    issue_date DATE NOT NULL,
     foreign key (account_number) references account(account_number),
     primary key (loan_id)
 );
@@ -143,7 +143,7 @@ CREATE TABLE loan_repayment(
     repayment_id SERIAL,
     loan_id INT NOT NULL,
     amount INT NOT NULL,
-    date TEXT NOT NULL,
+    date DATE NOT NULL,
     PRIMARY KEY (repayment_id),
     FOREIGN KEY (loan_id) REFERENCES loan(loan_id)
 );
