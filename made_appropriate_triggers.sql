@@ -105,7 +105,7 @@ Begin
       RAISE NOTICE ‘Insufficient Balance’;
       Return null;
       else
-      
+      update Account set balance = balance - new.withdrawal_amount where account_number = new.receiver_id ;
 update account set balance = balance - new.withdrawal_amount  where account_number = new.account_number;
 Return new;
 End if;
