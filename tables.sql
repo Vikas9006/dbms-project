@@ -147,3 +147,25 @@ CREATE TABLE loan_repayment(
     PRIMARY KEY (repayment_id),
     FOREIGN KEY (loan_id) REFERENCES loan(loan_id)
 );
+
+Create table deposit 
+(
+deposit_id serial not null,
+account_number int not null,
+amount float NULL,
+Primary key (deposit_id),
+FOREIGN KEY ( account_number) references Account (account_number)
+
+
+);
+
+Create table withdrawal
+(
+withdrawal_id serial not null,
+account_number int not null,
+withdrawal_amount float NULL,
+Primary key (withdrawal_id),
+FOREIGN KEY ( account_number) references Account (account_number)
+
+
+);
